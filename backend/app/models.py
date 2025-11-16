@@ -48,18 +48,19 @@
 #     news = relationship("News", back_populates="comments")
 #     user = relationship("User", back_populates="comments")
 
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime,TIMESTAMP
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, nullable=False)
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     role = Column(String, default="student")  # student / teacher / admin
+    # created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=Text('now()'))
 
     news = relationship("News", back_populates="author")
     comments = relationship("Comment", back_populates="user")
