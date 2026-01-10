@@ -1,50 +1,61 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
+
+interface Bookmark {
+  id: number;
+  title: string;
+  category: string;
+  date: string;
+  excerpt: string;
+  image: string;
+}
 
 export default function BookmarksScreen() {
   const router = useRouter();
+  const [bookmarkedNews, setBookmarkedNews] = useState<Bookmark[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [bookmarkedNews] = useState([
-    {
-      id: 1,
-      title: 'Mid-Term Examination Schedule Announced',
-      category: 'Academic',
-      date: '2025-11-12',
-      excerpt: 'The mid-term examination schedule has been published.',
-      image: 'https://via.placeholder.com/400x200/001f3f/ffffff?text=Exam'
-    },
-    {
-      id: 3,
-      title: 'Research Paper Published in IEEE',
-      category: 'Research',
-      date: '2025-11-08',
-      excerpt: 'Dr. Rahman publishes research on Machine Learning.',
-      image: 'https://via.placeholder.com/400x200/ff6b6b/ffffff?text=Research'
+  // 🔹 TEMP data loader (replace later with backend)
+  const loadBookmarks = async () => {
+    try {
+      // This simulates backend data
+      const data: Bookmark[] = [];
+
+      setBookmarkedNews(data);
+    } catch (error) {
+      console.log('Failed to load bookmarks');
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    loadBookmarks();
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
-      <Header />
-
       <View style={styles.content}>
         <Text style={styles.pageTitle}>🔖 Bookmarked News</Text>
-        <Text style={styles.subtitle}>
-          You have {bookmarkedNews.length} saved articles
-        </Text>
+
+        {loading ? (
+          <Text style={styles.subtitle}>Loading...</Text>
+        ) : (
+          <Text style={styles.subtitle}>
+            You have {bookmarkedNews.length} saved articles
+          </Text>
+        )}
 
         {/* Empty State */}
-        {bookmarkedNews.length === 0 ? (
+        {!loading && bookmarkedNews.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>📭</Text>
             <Text style={styles.emptyText}>No bookmarked news yet</Text>
@@ -63,17 +74,14 @@ export default function BookmarksScreen() {
               onPress={() =>
                 router.push({
                   pathname: '/news-detail',
-                  params: {
-                    id: item.id,
-                    title: item.title,
-                    category: item.category,
-                    date: item.date
-                  }
+                  params: { id: item.id }
                 })
               }
               style={styles.newsCard}
             >
-              <Image source={{ uri: item.image }} style={styles.newsImage} />
+              {item.image ? (
+                <Image source={{ uri: item.image }} style={styles.newsImage} />
+              ) : null}
 
               <View style={styles.newsContent}>
                 <View style={styles.newsHeader}>
@@ -88,21 +96,13 @@ export default function BookmarksScreen() {
           ))
         )}
       </View>
-
-      <Footer />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f6fa'
-  },
-
-  content: {
-    padding: 20
-  },
+  container: { flex: 1, backgroundColor: '#f5f6fa' },
+  content: { padding: 20 },
 
   pageTitle: {
     fontSize: 28,
@@ -110,14 +110,12 @@ const styles = StyleSheet.create({
     color: '#001f3f',
     marginBottom: 5
   },
-
   subtitle: {
     fontSize: 16,
     color: '#666',
     marginBottom: 25
   },
 
-  // Empty State
   emptyState: {
     alignItems: 'center',
     marginTop: 60
@@ -129,8 +127,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#001f3f',
     paddingHorizontal: 30,
     paddingVertical: 12,
-    borderRadius: 25,
-    elevation: 3
+    borderRadius: 25
   },
   browseButtonText: {
     color: '#fff',
@@ -138,7 +135,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
 
-  // News Card (matched with index styling)
   newsCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -150,7 +146,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 160
   },
-
   newsContent: {
     padding: 15
   },
@@ -176,7 +171,7 @@ const styles = StyleSheet.create({
   },
   newsExcerpt: {
     fontSize: 14,
-    color: '#666',
-    lineHeight: 20
+    color: '#666'
   }
 });
+
