@@ -73,7 +73,7 @@ export default function BookmarksScreen() {
               key={item.id}
               onPress={() =>
                 router.push({
-                  pathname: '/news-detail',
+                  pathname: '/newsdetailsscreen'',
                   params: { id: item.id }
                 })
               }
