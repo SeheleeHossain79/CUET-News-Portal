@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Footer from '../components/Footer';
-import Header from '../components/Header';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function ContactScreen() {
   const [formData, setFormData] = useState({
@@ -11,25 +17,41 @@ export default function ContactScreen() {
     message: '',
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { name, email, subject, message } = formData;
+
     if (!name || !email || !subject || !message) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
-    // Here you can integrate an API or email service
-    console.log('Contact form submitted:', formData);
+    try {
+      // 🔗 Backend endpoint (change later if needed)
+      const response = await fetch('http://YOUR_IP_ADDRESS:8000/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    Alert.alert('Success', 'Your message has been sent!');
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
 
-    setFormData({ name: '', email: '', subject: '', message: '' });
+      Alert.alert('Success', 'Your message has been sent!');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      Alert.alert(
+        'Backend not connected',
+        'Message saved locally or backend is not running yet.'
+      );
+    }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Header />
-
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* HERO */}
       <View style={styles.heroSection}>
         <Text style={styles.heroTitle}>Contact Us</Text>
         <Text style={styles.heroSubtitle}>
@@ -37,15 +59,17 @@ export default function ContactScreen() {
         </Text>
       </View>
 
+      {/* FORM */}
       <View style={styles.formSection}>
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Name *</Text>
           <TextInput
             style={styles.input}
             placeholder="Your name"
-            placeholderTextColor="#777"
             value={formData.name}
-            onChangeText={(text) => setFormData({ ...formData, name: text })}
+            onChangeText={(text) =>
+              setFormData({ ...formData, name: text })
+            }
           />
         </View>
 
@@ -54,10 +78,11 @@ export default function ContactScreen() {
           <TextInput
             style={styles.input}
             placeholder="Your email"
-            placeholderTextColor="#777"
             keyboardType="email-address"
             value={formData.email}
-            onChangeText={(text) => setFormData({ ...formData, email: text })}
+            onChangeText={(text) =>
+              setFormData({ ...formData, email: text })
+            }
           />
         </View>
 
@@ -66,9 +91,10 @@ export default function ContactScreen() {
           <TextInput
             style={styles.input}
             placeholder="Subject"
-            placeholderTextColor="#777"
             value={formData.subject}
-            onChangeText={(text) => setFormData({ ...formData, subject: text })}
+            onChangeText={(text) =>
+              setFormData({ ...formData, subject: text })
+            }
           />
         </View>
 
@@ -77,10 +103,11 @@ export default function ContactScreen() {
           <TextInput
             style={[styles.input, styles.textArea]}
             placeholder="Your message..."
-            placeholderTextColor="#777"
-            value={formData.message}
-            onChangeText={(text) => setFormData({ ...formData, message: text })}
             multiline
+            value={formData.message}
+            onChangeText={(text) =>
+              setFormData({ ...formData, message: text })
+            }
           />
         </View>
 
@@ -88,39 +115,61 @@ export default function ContactScreen() {
           <Text style={styles.submitButtonText}>Send Message</Text>
         </TouchableOpacity>
       </View>
-
-      <Footer />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f6fa' },
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f6fa',
+  },
 
   heroSection: {
-    padding: 20,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
     backgroundColor: '#001f3f',
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     alignItems: 'center',
   },
-  heroTitle: { color: '#fff', fontSize: 24, fontWeight: 'bold', marginBottom: 8 },
-  heroSubtitle: { color: '#ccc', fontSize: 14, textAlign: 'center' },
+  heroTitle: {
+    color: '#fff',
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  heroSubtitle: {
+    color: '#ddd',
+    fontSize: 14,
+    textAlign: 'center',
+  },
 
-  formSection: { padding: 20 },
+  formSection: {
+    padding: 20,
+  },
 
-  inputGroup: { marginBottom: 18 },
-  label: { fontSize: 16, fontWeight: 'bold', color: '#001f3f', marginBottom: 6 },
+  inputGroup: {
+    marginBottom: 18,
+  },
+  label: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#001f3f',
+    marginBottom: 6,
+  },
   input: {
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 14,
     fontSize: 14,
-    color: '#333',
     borderWidth: 1,
     borderColor: '#d0d6e0',
   },
-  textArea: { minHeight: 120, textAlignVertical: 'top' },
+  textArea: {
+    minHeight: 120,
+    textAlignVertical: 'top',
+  },
 
   submitButton: {
     backgroundColor: '#001f3f',
@@ -129,5 +178,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-  submitButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
